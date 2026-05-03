@@ -566,6 +566,91 @@
       font-size: 10px;
     }
 
+
+    .backup-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: flex-end;
+      background: rgba(15, 32, 51, .42);
+      backdrop-filter: blur(8px);
+      padding: 14px;
+    }
+
+    .backup-modal.show {
+      display: flex;
+    }
+
+    .backup-sheet {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 26px;
+      padding: 16px;
+      box-shadow: 0 24px 60px rgba(15, 32, 51, .22);
+      max-height: 78vh;
+      overflow: auto;
+    }
+
+    .backup-sheet h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .backup-sheet p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .backup-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .backup-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 10px;
+      background: #f8fafc;
+    }
+
+    .backup-row b {
+      display: block;
+      font-size: 14px;
+    }
+
+    .backup-row span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .backup-row button {
+      border: 0;
+      border-radius: 13px;
+      padding: 10px 12px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: white;
+      font-weight: 900;
+    }
+
+    @media (min-width: 780px) {
+      .backup-modal {
+        align-items: center;
+      }
+      .backup-sheet {
+        max-width: 520px;
+      }
+    }
+
     .desktop-table {
       display: none;
     }
@@ -669,8 +754,10 @@
         <button class="btn btn-green" onclick="window.print()">Salvar PDF</button>
         <button class="btn btn-soft" onclick="markVisibleAsTenho()">Marcar filtro</button>
         <button class="btn btn-red" onclick="resetAll()">Zerar</button>
-        <button class="btn btn-soft" onclick="exportBackup()">Backup progresso</button>
+        <button class="btn btn-soft" onclick="exportBackup()">Backup agora</button>
         <button class="btn btn-soft" onclick="importBackup()">Restaurar backup</button>
+        <button class="btn btn-soft" onclick="dailyBackupNow()">Backup diário</button>
+        <button class="btn btn-soft" onclick="showBackups()">Ver backups</button>
       </div>
     </section>
 
@@ -691,6 +778,19 @@
     </div>
   </nav>
 
+
+  <div class="backup-modal" id="backupModal" onclick="closeBackups(event)">
+    <div class="backup-sheet" onclick="event.stopPropagation()">
+      <h3>Backups diários</h3>
+      <p>O app cria automaticamente um snapshot diário no navegador. Para máxima segurança, baixe um backup de tempos em tempos.</p>
+      <div class="backup-list" id="backupList"></div>
+      <div class="actions">
+        <button class="btn btn-blue" onclick="exportLatestDailyBackup()">Baixar último backup</button>
+        <button class="btn btn-red" onclick="document.getElementById('backupModal').classList.remove('show')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="save-pill" id="savePill">Progresso salvo</div>
   <div class="toast" id="toast"></div>
 
@@ -705,6 +805,8 @@
     const DB_NAME = "album_copa_2026_db";
     const DB_STORE = "progresso";
     const DB_RECORD = "estado_atual";
+    const DAILY_BACKUP_PREFIX = "album_copa_2026_backup_diario_";
+    const LAST_DAILY_BACKUP_KEY = "album_copa_2026_ultimo_backup_diario";
 
     let data = structuredClone(BASE_DATA);
     let quickView = "";
@@ -800,6 +902,145 @@
       } catch(e) {}
       saveToIndexedDB(data);
       markSaveStatus("Progresso salvo");
+      setTimeout(() => createDailyBackup(false), 0);
+    }
+
+    function todayKey() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function dailyBackupPayload() {
+      const tenho = data.filter(x => x.status === "Tenho").length;
+      const repetidas = data.reduce((acc, x) => acc + (Number(x.repetidas) || 0), 0);
+      return {
+        app: "album-copa-2026",
+        type: "daily-auto-backup",
+        version: "mobile-paleta-copa",
+        date: todayKey(),
+        createdAt: new Date().toISOString(),
+        summary: {
+          total: data.length,
+          tenho,
+          faltam: data.length - tenho,
+          repetidas
+        },
+        data
+      };
+    }
+
+    function createDailyBackup(force = false) {
+      try {
+        const today = todayKey();
+        const last = localStorage.getItem(LAST_DAILY_BACKUP_KEY);
+        const key = DAILY_BACKUP_PREFIX + today;
+
+        if (!force && last === today && localStorage.getItem(key)) return false;
+
+        localStorage.setItem(key, JSON.stringify(dailyBackupPayload()));
+        localStorage.setItem(LAST_DAILY_BACKUP_KEY, today);
+        pruneDailyBackups(30);
+        markSaveStatus("Backup diário salvo");
+        return true;
+      } catch(e) {
+        toast("Não foi possível criar o backup diário.");
+        return false;
+      }
+    }
+
+    function pruneDailyBackups(maxDays = 30) {
+      try {
+        const keys = Object.keys(localStorage)
+          .filter(k => k.startsWith(DAILY_BACKUP_PREFIX))
+          .sort()
+          .reverse();
+
+        keys.slice(maxDays).forEach(k => localStorage.removeItem(k));
+      } catch(e) {}
+    }
+
+    function dailyBackupNow() {
+      const ok = createDailyBackup(true);
+      if (ok) toast("Backup diário criado no navegador.");
+    }
+
+    function getDailyBackups() {
+      try {
+        return Object.keys(localStorage)
+          .filter(k => k.startsWith(DAILY_BACKUP_PREFIX))
+          .sort()
+          .reverse()
+          .map(k => {
+            try {
+              const payload = JSON.parse(localStorage.getItem(k));
+              return { key: k, payload };
+            } catch(e) {
+              return null;
+            }
+          })
+          .filter(Boolean);
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function showBackups() {
+      const backups = getDailyBackups();
+      const list = document.getElementById("backupList");
+
+      if (!backups.length) {
+        list.innerHTML = '<div class="empty">Nenhum backup diário encontrado ainda.</div>';
+      } else {
+        list.innerHTML = backups.map(({ key, payload }) => `
+          <div class="backup-row">
+            <div>
+              <b>${payload.date || key.replace(DAILY_BACKUP_PREFIX, "")}</b>
+              <span>${payload.summary?.tenho || 0} tenho • ${payload.summary?.faltam || 0} faltam • ${payload.summary?.repetidas || 0} repetidas</span>
+            </div>
+            <button onclick="downloadDailyBackup('${key}')">Baixar</button>
+          </div>
+        `).join("");
+      }
+
+      document.getElementById("backupModal").classList.add("show");
+    }
+
+    function closeBackups(event) {
+      if (event.target.id === "backupModal") {
+        document.getElementById("backupModal").classList.remove("show");
+      }
+    }
+
+    function downloadJSON(payload, filename) {
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadDailyBackup(key) {
+      try {
+        const payload = JSON.parse(localStorage.getItem(key));
+        downloadJSON(payload, `backup_album_copa_2026_${payload.date || todayKey()}.json`);
+        toast("Backup baixado.");
+      } catch(e) {
+        toast("Backup não encontrado.");
+      }
+    }
+
+    function exportLatestDailyBackup() {
+      const backups = getDailyBackups();
+      if (!backups.length) {
+        dailyBackupNow();
+      }
+      const latest = getDailyBackups()[0];
+      if (latest) downloadDailyBackup(latest.key);
     }
 
     function escapeHtml(str) {
@@ -1002,13 +1243,7 @@
         data
       };
 
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "backup_progresso_album_copa_2026.json";
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadJSON(payload, "backup_progresso_album_copa_2026.json");
       toast("Backup do progresso gerado.");
     }
 
