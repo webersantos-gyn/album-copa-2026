@@ -1,51 +1,62 @@
-# Álbum Copa 2026 — Gabarito Mobile com Ícone
+# Álbum Copa 2026 — Versão com Google Sheets
 
-Este pacote está pronto para publicar no GitHub Pages.
+Esta versão permite sincronizar o progresso entre computador e Android usando uma planilha do Google Sheets como nuvem.
 
 ## Arquivos
 
-- `index.html`: app mobile do álbum
-- `manifest.json`: configuração para instalar/adicionar à tela inicial
+- `index.html`: app principal para publicar no GitHub Pages
+- `manifest.json`: configuração de instalação como app
 - `favicon.png`: ícone do navegador
-- `icons/icon-192.png`: ícone Android
-- `icons/icon-512.png`: ícone Android em alta resolução
+- `icons/`: ícones Android
+- `Code.gs`: código do Google Apps Script
+- `README.md`: este guia
 
-## Como publicar no GitHub Pages
+## Parte 1 — Atualizar o GitHub
 
-1. Crie ou abra o repositório `album-copa-2026`.
-2. Envie todos os arquivos deste pacote para a raiz do repositório.
-3. Vá em `Settings > Pages`.
-4. Em `Build and deployment`, selecione:
-   - Source: `Deploy from a branch`
-   - Branch: `main`
-   - Folder: `/root`
-5. Clique em `Save`.
+Envie para a raiz do repositório:
 
-Depois acesse o link do GitHub Pages no Chrome do Android.
+```text
+index.html
+manifest.json
+favicon.png
+README.md
+Code.gs
+icons/icon-192.png
+icons/icon-512.png
+```
 
-## Como colocar na tela inicial do Android
+O `Code.gs` não é usado pelo GitHub Pages, mas fica salvo como referência.
 
-1. Abra o site publicado no Chrome.
-2. Toque nos três pontos.
-3. Toque em `Adicionar à tela inicial` ou `Instalar app`.
-4. Confirme.
+## Parte 2 — Criar o Google Sheets
 
-O ícone será exibido como **Álbum 2026**.
+1. Crie uma planilha no Google Sheets.
+2. Nome sugerido: `Album Copa 2026 - Progresso`.
+3. Vá em `Extensões > Apps Script`.
+4. Apague o conteúdo do arquivo `Code.gs`.
+5. Cole o conteúdo do arquivo `Code.gs` deste pacote.
+6. Clique em Salvar.
 
+## Parte 3 — Publicar o Apps Script
 
-## Backup diário automático
+1. No Apps Script, clique em `Implantar`.
+2. Clique em `Nova implantação`.
+3. Em tipo, escolha `App da Web`.
+4. Em `Executar como`, escolha `Eu`.
+5. Em `Quem pode acessar`, escolha `Qualquer pessoa com o link`.
+6. Clique em `Implantar`.
+7. Autorize o acesso.
+8. Copie a URL do Web App, terminada em `/exec`.
 
-O app cria automaticamente um backup diário interno no navegador, mantendo os últimos 30 dias.
+## Parte 4 — Conectar no app
 
-Use os botões:
+1. Abra o site do GitHub Pages.
+2. Toque em `Configurar link`.
+3. Cole a URL do Apps Script terminada em `/exec`.
+4. Toque em `Enviar nuvem` para mandar seu progresso atual para o Google Sheets.
+5. No outro aparelho, configure o mesmo link e toque em `Carregar nuvem`.
 
-- **Backup diário**: cria/atualiza o backup do dia.
-- **Ver backups**: lista os backups internos disponíveis.
-- **Baixar último backup**: baixa um arquivo `.json` com o progresso.
+## Auto sync
 
-Importante: navegadores não permitem baixar arquivos automaticamente todos os dias sem ação do usuário. Por isso, o backup diário é salvo internamente e o download é feito por botão.
+O botão `Auto sync` liga ou desliga o envio automático para o Google Sheets após alterações.
 
-
-## Aviso dentro do app
-
-Foi incluído um aviso visual no painel inicial informando que o progresso fica salvo no navegador/celular e recomendando baixar backup antes de limpar cache, trocar de aparelho ou reinstalar o Chrome.
+Mesmo com auto sync, é recomendável usar `Enviar nuvem` antes de trocar de aparelho.

@@ -706,6 +706,75 @@
       width: 100%;
     }
 
+
+    .cloud-card {
+      margin-top: 12px;
+      background:
+        linear-gradient(135deg, rgba(49,87,255,.08), rgba(105,255,216,.18)),
+        #ffffff;
+      border: 1px solid rgba(49,87,255,.14);
+      border-radius: 22px;
+      padding: 12px;
+      box-shadow: 0 12px 26px rgba(0,66,54,.08);
+    }
+
+    .cloud-head {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+
+    .cloud-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      color: white;
+      font-size: 19px;
+      font-weight: 1000;
+      box-shadow: 0 8px 18px rgba(49,87,255,.16);
+    }
+
+    .cloud-card strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 3px;
+      color: #102033;
+    }
+
+    .cloud-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.42;
+    }
+
+    .cloud-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .cloud-actions .wide {
+      grid-column: 1 / -1;
+    }
+
+    .cloud-status {
+      margin-top: 8px;
+      border-radius: 14px;
+      padding: 9px 10px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      color: #334155;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
     .desktop-table {
       display: none;
     }
@@ -781,6 +850,25 @@
         <p>Seu progresso fica salvo neste navegador e neste celular. Antes de limpar cache, trocar de aparelho ou reinstalar o Chrome, use o backup para não perder suas figurinhas marcadas.</p>
         <button onclick="exportLatestDailyBackup()">Baixar backup de segurança</button>
       </div>
+    </section>
+
+
+    <section class="cloud-card" id="cloudSync">
+      <div class="cloud-head">
+        <div class="cloud-icon">☁</div>
+        <div>
+          <strong>Sincronização com Google Sheets</strong>
+          <p>Use o Google Sheets como nuvem para alternar entre computador e Android. Configure uma vez com o link do Apps Script.</p>
+        </div>
+      </div>
+
+      <div class="cloud-actions">
+        <button class="btn btn-blue" onclick="configureCloudUrl()">Configurar link</button>
+        <button class="btn btn-green" onclick="cloudPush()">Enviar nuvem</button>
+        <button class="btn btn-soft" onclick="cloudPull()">Carregar nuvem</button>
+        <button class="btn btn-soft" onclick="toggleAutoCloudSync()">Auto sync</button>
+      </div>
+      <div class="cloud-status" id="cloudStatus">Google Sheets ainda não configurado.</div>
     </section>
 
     <section class="panel" id="filters">
@@ -871,6 +959,10 @@
     const DB_RECORD = "estado_atual";
     const DAILY_BACKUP_PREFIX = "album_copa_2026_backup_diario_";
     const LAST_DAILY_BACKUP_KEY = "album_copa_2026_ultimo_backup_diario";
+    const CLOUD_URL_KEY = "album_copa_2026_google_sheets_url";
+    const CLOUD_AUTO_KEY = "album_copa_2026_google_sheets_auto";
+    const LOCAL_UPDATED_AT_KEY = "album_copa_2026_local_updated_at";
+    let cloudSaveTimer = null;
 
     let data = structuredClone(BASE_DATA);
     let quickView = "";
@@ -953,20 +1045,24 @@
       data = loadDataSync();
       const dbData = await loadFromIndexedDB();
       if (dbData) data = dbData;
-      saveData();
+      saveData({ cloud: false });
       fillFilters();
       render();
+      updateCloudStatus();
+      autoCloudPullOnStart();
     }
 
-    function saveData() {
+    function saveData(options = { cloud: true }) {
       try {
         const payload = JSON.stringify(data);
         localStorage.setItem(STORAGE_KEY, payload);
         localStorage.setItem(STORAGE_KEY + "_backup", payload);
+        localStorage.setItem(LOCAL_UPDATED_AT_KEY, new Date().toISOString());
       } catch(e) {}
       saveToIndexedDB(data);
       markSaveStatus("Progresso salvo");
       setTimeout(() => createDailyBackup(false), 0);
+      if (options.cloud) scheduleCloudSave();
     }
 
     function todayKey() {
@@ -1298,6 +1394,159 @@
       URL.revokeObjectURL(url);
       toast("CSV exportado.");
     }
+
+
+    function getCloudUrl() {
+      return (localStorage.getItem(CLOUD_URL_KEY) || "").trim();
+    }
+
+    function isAutoCloudEnabled() {
+      return localStorage.getItem(CLOUD_AUTO_KEY) === "sim";
+    }
+
+    function updateCloudStatus(message) {
+      const el = document.getElementById("cloudStatus");
+      if (!el) return;
+      const url = getCloudUrl();
+      const auto = isAutoCloudEnabled() ? "ligado" : "desligado";
+      el.textContent = message || (url ? `Google Sheets configurado • Auto sync ${auto}` : "Google Sheets ainda não configurado.");
+    }
+
+    function configureCloudUrl() {
+      const atual = getCloudUrl();
+      const url = prompt("Cole aqui o link do Web App do Google Apps Script terminado em /exec:", atual);
+      if (url === null) return;
+      const clean = url.trim();
+      if (!clean || !clean.includes("/exec")) {
+        toast("Link inválido. Ele deve terminar em /exec.");
+        return;
+      }
+      localStorage.setItem(CLOUD_URL_KEY, clean);
+      updateCloudStatus("Google Sheets configurado.");
+      toast("Link do Google Sheets salvo.");
+    }
+
+    function toggleAutoCloudSync() {
+      const novo = isAutoCloudEnabled() ? "nao" : "sim";
+      localStorage.setItem(CLOUD_AUTO_KEY, novo);
+      updateCloudStatus();
+      toast(novo === "sim" ? "Auto sync ligado." : "Auto sync desligado.");
+    }
+
+    function cloudPayload() {
+      const tenho = data.filter(x => x.status === "Tenho").length;
+      const repetidas = data.reduce((acc, x) => acc + (Number(x.repetidas) || 0), 0);
+      return {
+        app: "album-copa-2026",
+        version: "google-sheets-sync",
+        updatedAt: localStorage.getItem(LOCAL_UPDATED_AT_KEY) || new Date().toISOString(),
+        summary: {
+          total: data.length,
+          tenho,
+          faltam: data.length - tenho,
+          repetidas
+        },
+        data
+      };
+    }
+
+    function scheduleCloudSave() {
+      if (!isAutoCloudEnabled() || !getCloudUrl()) return;
+      clearTimeout(cloudSaveTimer);
+      cloudSaveTimer = setTimeout(() => {
+        cloudPush(true);
+      }, 1800);
+    }
+
+    async function cloudPush(silent = false) {
+      const url = getCloudUrl();
+      if (!url) {
+        if (!silent) configureCloudUrl();
+        return;
+      }
+
+      try {
+        updateCloudStatus("Enviando progresso para o Google Sheets...");
+        const form = new FormData();
+        form.append("action", "save");
+        form.append("payload", JSON.stringify(cloudPayload()));
+
+        await fetch(url, {
+          method: "POST",
+          mode: "no-cors",
+          body: form
+        });
+
+        updateCloudStatus("Progresso enviado para o Google Sheets.");
+        if (!silent) toast("Progresso enviado para a nuvem.");
+      } catch(e) {
+        updateCloudStatus("Falha ao enviar para o Google Sheets.");
+        if (!silent) toast("Não consegui enviar para a nuvem.");
+      }
+    }
+
+    function cloudPull() {
+      const url = getCloudUrl();
+      if (!url) {
+        configureCloudUrl();
+        return;
+      }
+
+      const callbackName = "albumCopaCloudCallback_" + Date.now();
+      updateCloudStatus("Carregando progresso do Google Sheets...");
+
+      window[callbackName] = function(response) {
+        try {
+          delete window[callbackName];
+
+          if (!response || !response.ok || !response.payload) {
+            updateCloudStatus("Nenhum progresso encontrado no Google Sheets.");
+            toast("Nenhum progresso na nuvem.");
+            return;
+          }
+
+          const restored = normalizeData(response.payload.data || response.payload);
+          if (!restored) {
+            updateCloudStatus("Dados inválidos no Google Sheets.");
+            toast("Dados da nuvem inválidos.");
+            return;
+          }
+
+          data = restored;
+          if (response.payload.updatedAt) {
+            localStorage.setItem(LOCAL_UPDATED_AT_KEY, response.payload.updatedAt);
+          }
+          saveData({ cloud: false });
+          fillFilters();
+          render();
+          updateCloudStatus("Progresso carregado do Google Sheets.");
+          toast("Progresso carregado da nuvem.");
+        } catch(e) {
+          updateCloudStatus("Erro ao carregar dados da nuvem.");
+          toast("Erro ao carregar da nuvem.");
+        } finally {
+          const old = document.getElementById(callbackName);
+          if (old) old.remove();
+        }
+      };
+
+      const script = document.createElement("script");
+      script.id = callbackName;
+      script.src = `${url}?action=get&callback=${callbackName}&t=${Date.now()}`;
+      script.onerror = function() {
+        delete window[callbackName];
+        updateCloudStatus("Erro de conexão com o Google Sheets.");
+        toast("Erro ao conectar na nuvem.");
+        script.remove();
+      };
+      document.body.appendChild(script);
+    }
+
+    function autoCloudPullOnStart() {
+      if (!isAutoCloudEnabled() || !getCloudUrl()) return;
+      setTimeout(() => cloudPull(), 700);
+    }
+
 
     function exportBackup() {
       const payload = {
