@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Álbum Copa 2026 — Controle Mobile</title>
+  <style>
+    :root {
+      /* Paleta inspirada na identidade visual da Copa 2026:
+         azul = confiança, vermelho = energia, verde = progresso,
+         amarelo = conquista, roxo = celebração, turquesa = fluidez. */
+      --bg: #f8fafc;
+      --card: rgba(255,255,255,.92);
+      --text: #102033;
+      --muted: #64748b;
+      --line: rgba(15, 32, 51, .12);
+
+      --navy: #004236;
+      --blue: #3157ff;
+      --blue-soft: #e8edff;
+      --red: #e30613;
+      --red-soft: #ffe2e5;
+      --green: #97f000;
+      --green-dark: #2f7d20;
+      --green-soft: #ecffd6;
+      --yellow: #ecff00;
+      --yellow-soft: #fbffc7;
+      --purple: #6a00ff;
+      --purple-soft: #efe3ff;
+      --turquoise: #69ffd8;
+      --orange: #ff3d00;
+
+      --shadow: 0 18px 38px rgba(0, 66, 54, .13);
+      --radius: 20px;
+      --bottom-safe: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(105,255,216,.45), transparent 28%),
+        radial-gradient(circle at 100% 0%, rgba(236,255,0,.36), transparent 24%),
+        radial-gradient(circle at 100% 38%, rgba(106,0,255,.18), transparent 28%),
+        linear-gradient(180deg, #fffefa 0%, #f5f8ff 52%, #edfdf8 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: calc(92px + var(--bottom-safe));
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: linear-gradient(135deg, rgba(0,66,54,.96), rgba(16,32,51,.94));
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(105,255,216,.24);
+      padding: 12px 14px;
+      color: white;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ball {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 35% 35%, #ffffff 0 18%, transparent 19%),
+        linear-gradient(135deg, var(--red), var(--purple) 48%, var(--blue));
+      color: white;
+      font-size: 22px;
+      box-shadow: 0 10px 24px rgba(227,6,19,.32);
+      flex: 0 0 auto;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.1;
+      letter-spacing: -.35px;
+    }
+
+    .title p {
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+    }
+
+    main {
+      padding: 12px 14px 0;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .progress-card {
+      background:
+        linear-gradient(135deg, rgba(0,66,54,.92), rgba(16,32,51,.92)),
+        repeating-radial-gradient(circle at 88% 10%, rgba(105,255,216,.35) 0 14px, rgba(236,255,0,.28) 15px 28px, rgba(106,0,255,.24) 29px 42px, rgba(227,6,19,.25) 43px 56px);
+      color: white;
+      border-radius: 26px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(105,255,216,.22);
+    }
+
+    .progress-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -70px auto;
+      width: 190px;
+      height: 190px;
+      border-radius: 38px;
+      background:
+        repeating-radial-gradient(circle at center,
+          rgba(227,6,19,.65) 0 16px,
+          rgba(162,123,255,.62) 17px 32px,
+          rgba(49,87,255,.62) 33px 48px,
+          rgba(236,255,0,.58) 49px 64px,
+          rgba(105,255,216,.58) 65px 80px);
+      opacity: .42;
+      transform: rotate(12deg);
+    }
+
+    .progress-main {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-main strong {
+      display: block;
+      font-size: 42px;
+      letter-spacing: -1.5px;
+      line-height: 1;
+    }
+
+    .progress-main span {
+      color: rgba(255,255,255,.72);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: rgba(255,255,255,.16);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--green), var(--yellow), var(--turquoise));
+      border-radius: inherit;
+      transition: width .25s ease;
+    }
+
+    .mini-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mini-kpi {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 18px;
+      padding: 10px;
+    }
+
+    .mini-kpi span {
+      display: block;
+      font-size: 11px;
+      color: rgba(255,255,255,.68);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .mini-kpi b {
+      display: block;
+      margin-top: 3px;
+      font-size: 21px;
+    }
+
+    .panel {
+      margin-top: 12px;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.85);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 12px;
+      backdrop-filter: blur(16px);
+    }
+
+    .search {
+      position: relative;
+    }
+
+    .search input {
+      width: 100%;
+      height: 52px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      padding: 0 14px 0 42px;
+      font-size: 16px;
+      outline: none;
+      background: white;
+    }
+
+    .search::before {
+      content: "🔎";
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      font-size: 18px;
+      z-index: 1;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    select, input, button {
+      font: inherit;
+    }
+
+    select {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      padding: 0 10px;
+      background: white;
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+    }
+
+    .quick-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 16px;
+      padding: 11px 7px;
+      background: var(--blue-soft);
+      color: #1735a7;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: white;
+      box-shadow: 0 10px 20px rgba(49,87,255,.24);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 17px;
+      min-height: 48px;
+      padding: 10px;
+      font-weight: 950;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-blue { background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; }
+    .btn-green { background: linear-gradient(135deg, var(--green-dark), #16a34a); color: white; }
+    .btn-soft { background: var(--yellow-soft); color: #4b5600; }
+    .btn-red { background: var(--red-soft); color: #9b0010; }
+
+    .list-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 14px 2px 8px;
+      gap: 10px;
+    }
+
+    .list-head h2 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -.25px;
+    }
+
+    .list-head span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .cards {
+      display: grid;
+      gap: 10px;
+    }
+
+    .sticker-card {
+      background: white;
+      border: 1px solid rgba(226,232,240,.95);
+      border-radius: 22px;
+      padding: 12px;
+      box-shadow: 0 10px 24px rgba(15,23,42,.06);
+    }
+
+    .sticker-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .code {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 8px 11px;
+      background: linear-gradient(135deg, var(--blue-soft), var(--turquoise));
+      color: #00342c;
+      font-weight: 1000;
+      letter-spacing: .2px;
+      font-size: 14px;
+      border: 1px solid rgba(0,66,54,.10);
+    }
+
+    .type {
+      border-radius: 999px;
+      padding: 6px 9px;
+      background: linear-gradient(135deg, var(--purple-soft), #fff);
+      color: #4210a3;
+      font-weight: 900;
+      font-size: 11px;
+      white-space: nowrap;
+      border: 1px solid rgba(106,0,255,.10);
+    }
+
+    .sticker-card h3 {
+      margin: 10px 0 4px;
+      font-size: 16px;
+      letter-spacing: -.2px;
+    }
+
+    .meta {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .card-controls {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 8px;
+      margin-top: 11px;
+    }
+
+    .status-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #f1f5f9;
+      border-radius: 16px;
+      padding: 4px;
+    }
+
+    .status-btn {
+      border: 0;
+      min-height: 42px;
+      border-radius: 13px;
+      font-weight: 950;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .status-btn.on-have {
+      background: linear-gradient(135deg, var(--green-dark), #17a34a);
+      color: white;
+      box-shadow: 0 8px 16px rgba(47,125,32,.22);
+    }
+
+    .status-btn.on-miss {
+      background: linear-gradient(135deg, var(--red), var(--orange));
+      color: white;
+      box-shadow: 0 8px 16px rgba(227,6,19,.20);
+    }
+
+    .rep-control {
+      display: grid;
+      grid-template-columns: 42px 1fr 42px;
+      align-items: center;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .rep-control button {
+      height: 44px;
+      border: 0;
+      background: transparent;
+      font-size: 20px;
+      font-weight: 1000;
+      color: var(--purple);
+      cursor: pointer;
+    }
+
+    .rep-control span {
+      text-align: center;
+      font-weight: 1000;
+    }
+
+    .obs {
+      width: 100%;
+      margin-top: 8px;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 0 11px;
+      outline: none;
+      font-size: 15px;
+      background: #fff;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 28px 12px;
+      color: var(--muted);
+      background: white;
+      border-radius: 20px;
+      border: 1px dashed var(--line);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 30;
+      padding: 9px 12px calc(9px + var(--bottom-safe));
+      background: rgba(255,255,255,.92);
+      border-top: 1px solid rgba(0,66,54,.12);
+      backdrop-filter: blur(16px);
+    }
+
+    .bottom-grid {
+      max-width: 760px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .nav-btn {
+      min-height: 54px;
+      border: 0;
+      border-radius: 18px;
+      background: white;
+      color: #0f172a;
+      box-shadow: 0 8px 20px rgba(15,23,42,.08);
+      font-weight: 950;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .nav-btn.primary {
+      background: linear-gradient(135deg, var(--navy), var(--blue));
+      color: white;
+    }
+
+    .toast {
+      position: fixed;
+      left: 14px;
+      right: 14px;
+      bottom: calc(88px + var(--bottom-safe));
+      background: #0f172a;
+      color: white;
+      padding: 13px 16px;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: all .2s ease;
+      z-index: 50;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+
+    .save-pill {
+      position: fixed;
+      right: 12px;
+      top: 70px;
+      z-index: 35;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 8px 11px;
+      background: rgba(255,255,255,.92);
+      color: #004236;
+      border: 1px solid rgba(0,66,54,.12);
+      box-shadow: 0 8px 18px rgba(0,66,54,.10);
+      font-size: 12px;
+      font-weight: 950;
+      backdrop-filter: blur(14px);
+    }
+
+    .save-pill::before {
+      content: "●";
+      color: var(--green-dark);
+      font-size: 10px;
+    }
+
+    .desktop-table {
+      display: none;
+    }
+
+    @media (min-width: 780px) {
+      body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(105,255,216,.45), transparent 28%),
+        radial-gradient(circle at 100% 0%, rgba(236,255,0,.36), transparent 24%),
+        radial-gradient(circle at 100% 38%, rgba(106,0,255,.18), transparent 28%),
+        linear-gradient(180deg, #fffefa 0%, #f5f8ff 52%, #edfdf8 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: calc(92px + var(--bottom-safe));
+    }
+
+    @media print {
+      body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(105,255,216,.45), transparent 28%),
+        radial-gradient(circle at 100% 0%, rgba(236,255,0,.36), transparent 24%),
+        radial-gradient(circle at 100% 38%, rgba(106,0,255,.18), transparent 28%),
+        linear-gradient(180deg, #fffefa 0%, #f5f8ff 52%, #edfdf8 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: calc(92px + var(--bottom-safe));
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="topbar">
+      <div class="ball">⚽</div>
+      <div class="title">
+        <h1>Álbum Copa 2026</h1>
+        <p>Controle mobile • Paleta Copa 2026 • Chrome Android</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="progress-card" id="top" aria-label="Resumo da coleção">
+      <div class="progress-main">
+        <div>
+          <strong id="kpiPct">0%</strong>
+          <span>concluído</span>
+        </div>
+        <div style="text-align:right">
+          <strong id="kpiFaltam">994</strong>
+          <span>faltam</span>
+        </div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+      </div>
+
+      <div class="mini-kpis">
+        <div class="mini-kpi"><span>Total</span><b id="kpiTotal">994</b></div>
+        <div class="mini-kpi"><span>Tenho</span><b id="kpiTenho">0</b></div>
+        <div class="mini-kpi"><span>Repetidas</span><b id="kpiRep">0</b></div>
+      </div>
+    </section>
+
+    <section class="panel" id="filters">
+      <div class="search">
+        <input id="search" placeholder="Buscar: BRA10, Brasil, FWC, CC..." autocomplete="off" />
+      </div>
+
+      <div class="quick-tabs">
+        <button class="tab active" data-view="">Tudo</button>
+        <button class="tab" data-view="faltantes">Faltam</button>
+        <button class="tab" data-view="tenho">Tenho</button>
+        <button class="tab" data-view="repetidas">Trocas</button>
+      </div>
+
+      <div class="filter-grid">
+        <select id="filterGrupo"><option value="">Todos os grupos</option></select>
+        <select id="filterSelecao"><option value="">Todas as seleções</option></select>
+        <select id="filterTipo">
+          <option value="">Todos os tipos</option>
+          <option>Especial</option>
+          <option>Seleção</option>
+          <option>História</option>
+          <option>Coca-Cola</option>
+        </select>
+        <select id="sortBy">
+          <option value="codigo">Ordem oficial</option>
+          <option value="faltantes">Faltantes primeiro</option>
+          <option value="repetidas">Repetidas primeiro</option>
+          <option value="selecao">Por seleção</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-blue" onclick="exportCSV()">Exportar CSV</button>
+        <button class="btn btn-green" onclick="window.print()">Salvar PDF</button>
+        <button class="btn btn-soft" onclick="markVisibleAsTenho()">Marcar filtro</button>
+        <button class="btn btn-red" onclick="resetAll()">Zerar</button>
+        <button class="btn btn-soft" onclick="exportBackup()">Backup progresso</button>
+        <button class="btn btn-soft" onclick="importBackup()">Restaurar backup</button>
+      </div>
+    </section>
+
+    <div class="list-head" id="list">
+      <h2>Figurinhas</h2>
+      <span id="countInfo">Mostrando 994</span>
+    </div>
+
+    <section class="cards" id="cards"></section>
+  </main>
+
+  <nav class="bottom-nav">
+    <div class="bottom-grid">
+      <button class="nav-btn primary" onclick="scrollToTop()">Topo</button>
+      <button class="nav-btn" onclick="setQuick('faltantes')">Faltam</button>
+      <button class="nav-btn" onclick="setQuick('repetidas')">Trocas</button>
+      <button class="nav-btn" onclick="focusSearch()">Buscar</button>
+    </div>
+  </nav>
+
+  <div class="save-pill" id="savePill">Progresso salvo</div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const BASE_DATA = [{"codigo": "FWC00", "grupo": "Página inicial", "selecao": "Página inicial", "item": "FWC00", "tipo": "Especial", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC1", "grupo": "Página inicial", "selecao": "Página inicial", "item": "FWC1", "tipo": "Especial", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC2", "grupo": "Página inicial", "selecao": "Página inicial", "item": "FWC2", "tipo": "Especial", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC3", "grupo": "Página inicial", "selecao": "Página inicial", "item": "FWC3", "tipo": "Especial", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC4", "grupo": "Página inicial", "selecao": "Página inicial", "item": "FWC4", "tipo": "Especial", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC5", "grupo": "Página inicial", "selecao": "Página inicial", "item": "FWC5", "tipo": "Especial", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC6", "grupo": "Página inicial", "selecao": "Página inicial", "item": "FWC6", "tipo": "Especial", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC7", "grupo": "Página inicial", "selecao": "Página inicial", "item": "FWC7", "tipo": "Especial", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC8", "grupo": "Página inicial", "selecao": "Página inicial", "item": "FWC8", "tipo": "Especial", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX1", "grupo": "Grupo A", "selecao": "México", "item": "México 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX2", "grupo": "Grupo A", "selecao": "México", "item": "México 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX3", "grupo": "Grupo A", "selecao": "México", "item": "México 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX4", "grupo": "Grupo A", "selecao": "México", "item": "México 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX5", "grupo": "Grupo A", "selecao": "México", "item": "México 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX6", "grupo": "Grupo A", "selecao": "México", "item": "México 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX7", "grupo": "Grupo A", "selecao": "México", "item": "México 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX8", "grupo": "Grupo A", "selecao": "México", "item": "México 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX9", "grupo": "Grupo A", "selecao": "México", "item": "México 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX10", "grupo": "Grupo A", "selecao": "México", "item": "México 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX11", "grupo": "Grupo A", "selecao": "México", "item": "México 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX12", "grupo": "Grupo A", "selecao": "México", "item": "México 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX13", "grupo": "Grupo A", "selecao": "México", "item": "México 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX14", "grupo": "Grupo A", "selecao": "México", "item": "México 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX15", "grupo": "Grupo A", "selecao": "México", "item": "México 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX16", "grupo": "Grupo A", "selecao": "México", "item": "México 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX17", "grupo": "Grupo A", "selecao": "México", "item": "México 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX18", "grupo": "Grupo A", "selecao": "México", "item": "México 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX19", "grupo": "Grupo A", "selecao": "México", "item": "México 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MEX20", "grupo": "Grupo A", "selecao": "México", "item": "México 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA1", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA2", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA3", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA4", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA5", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA6", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA7", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA8", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA9", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA10", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA11", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA12", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA13", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA14", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA15", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA16", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA17", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA18", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA19", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "RSA20", "grupo": "Grupo A", "selecao": "África do Sul", "item": "África do Sul 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR1", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR2", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR3", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR4", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR5", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR6", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR7", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR8", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR9", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR10", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR11", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR12", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR13", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR14", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR15", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR16", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR17", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR18", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR19", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KOR20", "grupo": "Grupo A", "selecao": "Coreia do Sul", "item": "Coreia do Sul 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE1", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE2", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE3", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE4", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE5", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE6", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE7", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE8", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE9", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE10", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE11", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE12", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE13", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE14", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE15", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE16", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE17", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE18", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE19", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CZE20", "grupo": "Grupo A", "selecao": "Rep. Tcheca", "item": "Rep. Tcheca 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN1", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN2", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN3", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN4", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN5", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN6", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN7", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN8", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN9", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN10", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN11", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN12", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN13", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN14", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN15", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN16", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN17", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN18", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN19", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CAN20", "grupo": "Grupo B", "selecao": "Canadá", "item": "Canadá 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH1", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH2", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH3", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH4", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH5", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH6", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH7", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH8", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH9", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH10", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH11", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH12", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH13", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH14", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH15", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH16", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH17", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH18", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH19", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BIH20", "grupo": "Grupo B", "selecao": "Bósnia", "item": "Bósnia 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT1", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT2", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT3", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT4", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT5", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT6", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT7", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT8", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT9", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT10", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT11", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT12", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT13", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT14", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT15", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT16", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT17", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT18", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT19", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "QAT20", "grupo": "Grupo B", "selecao": "Catar", "item": "Catar 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI1", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI2", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI3", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI4", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI5", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI6", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI7", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI8", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI9", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI10", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI11", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI12", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI13", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI14", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI15", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI16", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI17", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI18", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI19", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SUI20", "grupo": "Grupo B", "selecao": "Suíça", "item": "Suíça 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA1", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA2", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA3", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA4", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA5", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA6", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA7", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA8", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA9", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA10", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA11", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA12", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA13", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA14", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA15", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA16", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA17", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA18", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA19", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BRA20", "grupo": "Grupo C", "selecao": "Brasil", "item": "Brasil 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR1", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR2", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR3", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR4", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR5", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR6", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR7", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR8", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR9", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR10", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR11", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR12", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR13", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR14", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR15", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR16", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR17", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR18", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR19", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "MAR20", "grupo": "Grupo C", "selecao": "Marrocos", "item": "Marrocos 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI1", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI2", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI3", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI4", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI5", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI6", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI7", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI8", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI9", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI10", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI11", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI12", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI13", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI14", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI15", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI16", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI17", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI18", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI19", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "HAI20", "grupo": "Grupo C", "selecao": "Haiti", "item": "Haiti 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO1", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO2", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO3", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO4", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO5", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO6", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO7", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO8", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO9", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO10", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO11", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO12", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO13", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO14", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO15", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO16", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO17", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO18", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO19", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SCO20", "grupo": "Grupo C", "selecao": "Escócia", "item": "Escócia 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA1", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA2", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA3", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA4", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA5", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA6", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA7", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA8", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA9", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA10", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA11", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA12", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA13", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA14", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA15", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA16", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA17", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA18", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA19", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "USA20", "grupo": "Grupo D", "selecao": "Estados Unidos", "item": "Estados Unidos 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR1", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR2", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR3", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR4", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR5", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR6", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR7", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR8", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR9", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR10", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR11", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR12", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR13", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR14", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR15", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR16", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR17", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR18", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR19", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAR20", "grupo": "Grupo D", "selecao": "Paraguai", "item": "Paraguai 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS1", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS2", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS3", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS4", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS5", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS6", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS7", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS8", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS9", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS10", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS11", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS12", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS13", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS14", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS15", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS16", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS17", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS18", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS19", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUS20", "grupo": "Grupo D", "selecao": "Austrália", "item": "Austrália 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR1", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR2", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR3", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR4", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR5", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR6", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR7", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR8", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR9", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR10", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR11", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR12", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR13", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR14", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR15", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR16", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR17", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR18", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR19", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUR20", "grupo": "Grupo D", "selecao": "Turquia", "item": "Turquia 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER1", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER2", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER3", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER4", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER5", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER6", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER7", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER8", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER9", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER10", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER11", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER12", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER13", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER14", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER15", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER16", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER17", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER18", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER19", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GER20", "grupo": "Grupo E", "selecao": "Alemanha", "item": "Alemanha 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW1", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW2", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW3", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW4", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW5", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW6", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW7", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW8", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW9", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW10", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW11", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW12", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW13", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW14", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW15", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW16", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW17", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW18", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW19", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CUW20", "grupo": "Grupo E", "selecao": "Curaçao", "item": "Curaçao 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV1", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV2", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV3", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV4", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV5", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV6", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV7", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV8", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV9", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV10", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV11", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV12", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV13", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV14", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV15", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV16", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV17", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV18", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV19", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CIV20", "grupo": "Grupo E", "selecao": "Costa do Marfim", "item": "Costa do Marfim 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU1", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU2", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU3", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU4", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU5", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU6", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU7", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU8", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU9", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU10", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU11", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU12", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU13", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU14", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU15", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU16", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU17", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU18", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU19", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ECU20", "grupo": "Grupo E", "selecao": "Equador", "item": "Equador 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED1", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED2", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED3", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED4", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED5", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED6", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED7", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED8", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED9", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED10", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED11", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED12", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED13", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED14", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED15", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED16", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED17", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED18", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED19", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NED20", "grupo": "Grupo F", "selecao": "Holanda", "item": "Holanda 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN1", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN2", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN3", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN4", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN5", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN6", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN7", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN8", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN9", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN10", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN11", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN12", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN13", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN14", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN15", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN16", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN17", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN18", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN19", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JPN20", "grupo": "Grupo F", "selecao": "Japão", "item": "Japão 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE1", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE2", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE3", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE4", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE5", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE6", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE7", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE8", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE9", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE10", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE11", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE12", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE13", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE14", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE15", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE16", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE17", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE18", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE19", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SWE20", "grupo": "Grupo F", "selecao": "Suécia", "item": "Suécia 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN1", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN2", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN3", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN4", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN5", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN6", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN7", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN8", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN9", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN10", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN11", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN12", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN13", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN14", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN15", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN16", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN17", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN18", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN19", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "TUN20", "grupo": "Grupo F", "selecao": "Tunísia", "item": "Tunísia 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL1", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL2", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL3", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL4", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL5", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL6", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL7", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL8", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL9", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL10", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL11", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL12", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL13", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL14", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL15", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL16", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL17", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL18", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL19", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "BEL20", "grupo": "Grupo G", "selecao": "Bélgica", "item": "Bélgica 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY1", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY2", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY3", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY4", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY5", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY6", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY7", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY8", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY9", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY10", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY11", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY12", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY13", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY14", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY15", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY16", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY17", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY18", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY19", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "EGY20", "grupo": "Grupo G", "selecao": "Egito", "item": "Egito 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN1", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN2", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN3", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN4", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN5", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN6", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN7", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN8", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN9", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN10", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN11", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN12", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN13", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN14", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN15", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN16", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN17", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN18", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN19", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRN20", "grupo": "Grupo G", "selecao": "Irã", "item": "Irã 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL1", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL2", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL3", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL4", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL5", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL6", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL7", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL8", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL9", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL10", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL11", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL12", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL13", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL14", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL15", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL16", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL17", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL18", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL19", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NZL20", "grupo": "Grupo G", "selecao": "Nova Zelândia", "item": "Nova Zelândia 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP1", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP2", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP3", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP4", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP5", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP6", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP7", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP8", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP9", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP10", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP11", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP12", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP13", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP14", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP15", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP16", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP17", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP18", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP19", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ESP20", "grupo": "Grupo H", "selecao": "Espanha", "item": "Espanha 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV1", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV2", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV3", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV4", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV5", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV6", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV7", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV8", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV9", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV10", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV11", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV12", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV13", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV14", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV15", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV16", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV17", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV18", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV19", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CPV20", "grupo": "Grupo H", "selecao": "Cabo Verde", "item": "Cabo Verde 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA1", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA2", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA3", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA4", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA5", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA6", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA7", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA8", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA9", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA10", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA11", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA12", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA13", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA14", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA15", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA16", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA17", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA18", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA19", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "KSA20", "grupo": "Grupo H", "selecao": "Arábia Saudita", "item": "Arábia Saudita 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU1", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU2", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU3", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU4", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU5", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU6", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU7", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU8", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU9", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU10", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU11", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU12", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU13", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU14", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU15", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU16", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU17", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU18", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU19", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "URU20", "grupo": "Grupo H", "selecao": "Uruguai", "item": "Uruguai 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA1", "grupo": "Grupo I", "selecao": "França", "item": "França 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA2", "grupo": "Grupo I", "selecao": "França", "item": "França 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA3", "grupo": "Grupo I", "selecao": "França", "item": "França 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA4", "grupo": "Grupo I", "selecao": "França", "item": "França 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA5", "grupo": "Grupo I", "selecao": "França", "item": "França 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA6", "grupo": "Grupo I", "selecao": "França", "item": "França 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA7", "grupo": "Grupo I", "selecao": "França", "item": "França 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA8", "grupo": "Grupo I", "selecao": "França", "item": "França 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA9", "grupo": "Grupo I", "selecao": "França", "item": "França 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA10", "grupo": "Grupo I", "selecao": "França", "item": "França 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA11", "grupo": "Grupo I", "selecao": "França", "item": "França 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA12", "grupo": "Grupo I", "selecao": "França", "item": "França 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA13", "grupo": "Grupo I", "selecao": "França", "item": "França 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA14", "grupo": "Grupo I", "selecao": "França", "item": "França 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA15", "grupo": "Grupo I", "selecao": "França", "item": "França 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA16", "grupo": "Grupo I", "selecao": "França", "item": "França 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA17", "grupo": "Grupo I", "selecao": "França", "item": "França 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA18", "grupo": "Grupo I", "selecao": "França", "item": "França 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA19", "grupo": "Grupo I", "selecao": "França", "item": "França 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FRA20", "grupo": "Grupo I", "selecao": "França", "item": "França 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN1", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN2", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN3", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN4", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN5", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN6", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN7", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN8", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN9", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN10", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN11", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN12", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN13", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN14", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN15", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN16", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN17", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN18", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN19", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "SEN20", "grupo": "Grupo I", "selecao": "Senegal", "item": "Senegal 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ1", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ2", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ3", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ4", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ5", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ6", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ7", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ8", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ9", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ10", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ11", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ12", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ13", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ14", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ15", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ16", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ17", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ18", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ19", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "IRQ20", "grupo": "Grupo I", "selecao": "Iraque", "item": "Iraque 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR1", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR2", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR3", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR4", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR5", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR6", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR7", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR8", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR9", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR10", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR11", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR12", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR13", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR14", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR15", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR16", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR17", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR18", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR19", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "NOR20", "grupo": "Grupo I", "selecao": "Noruega", "item": "Noruega 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG1", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG2", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG3", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG4", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG5", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG6", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG7", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG8", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG9", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG10", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG11", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG12", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG13", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG14", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG15", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG16", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG17", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG18", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG19", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ARG20", "grupo": "Grupo J", "selecao": "Argentina", "item": "Argentina 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG1", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG2", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG3", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG4", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG5", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG6", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG7", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG8", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG9", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG10", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG11", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG12", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG13", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG14", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG15", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG16", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG17", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG18", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG19", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ALG20", "grupo": "Grupo J", "selecao": "Argélia", "item": "Argélia 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT1", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT2", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT3", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT4", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT5", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT6", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT7", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT8", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT9", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT10", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT11", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT12", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT13", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT14", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT15", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT16", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT17", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT18", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT19", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "AUT20", "grupo": "Grupo J", "selecao": "Áustria", "item": "Áustria 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR1", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR2", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR3", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR4", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR5", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR6", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR7", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR8", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR9", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR10", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR11", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR12", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR13", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR14", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR15", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR16", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR17", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR18", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR19", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "JOR20", "grupo": "Grupo J", "selecao": "Jordânia", "item": "Jordânia 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR1", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR2", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR3", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR4", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR5", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR6", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR7", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR8", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR9", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR10", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR11", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR12", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR13", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR14", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR15", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR16", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR17", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR18", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR19", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "POR20", "grupo": "Grupo K", "selecao": "Portugal", "item": "Portugal 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD1", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD2", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD3", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD4", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD5", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD6", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD7", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD8", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD9", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD10", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD11", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD12", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD13", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD14", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD15", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD16", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD17", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD18", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD19", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COD20", "grupo": "Grupo K", "selecao": "Congo", "item": "Congo 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB1", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB2", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB3", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB4", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB5", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB6", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB7", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB8", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB9", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB10", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB11", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB12", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB13", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB14", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB15", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB16", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB17", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB18", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB19", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "UZB20", "grupo": "Grupo K", "selecao": "Uzbequistão", "item": "Uzbequistão 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL1", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL2", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL3", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL4", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL5", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL6", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL7", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL8", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL9", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL10", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL11", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL12", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL13", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL14", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL15", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL16", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL17", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL18", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL19", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "COL20", "grupo": "Grupo K", "selecao": "Colômbia", "item": "Colômbia 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG1", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG2", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG3", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG4", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG5", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG6", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG7", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG8", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG9", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG10", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG11", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG12", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG13", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG14", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG15", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG16", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG17", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG18", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG19", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "ENG20", "grupo": "Grupo L", "selecao": "Inglaterra", "item": "Inglaterra 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO1", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO2", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO3", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO4", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO5", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO6", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO7", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO8", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO9", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO10", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO11", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO12", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO13", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO14", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO15", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO16", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO17", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO18", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO19", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CRO20", "grupo": "Grupo L", "selecao": "Croácia", "item": "Croácia 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA1", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA2", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA3", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA4", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA5", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA6", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA7", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA8", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA9", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA10", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA11", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA12", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA13", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA14", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA15", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA16", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA17", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA18", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA19", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "GHA20", "grupo": "Grupo L", "selecao": "Gana", "item": "Gana 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN1", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 1", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN2", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 2", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN3", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 3", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN4", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 4", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN5", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 5", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN6", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 6", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN7", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 7", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN8", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 8", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN9", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 9", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN10", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 10", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN11", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 11", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN12", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 12", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN13", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 13", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN14", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 14", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN15", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 15", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN16", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 16", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN17", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 17", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN18", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 18", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN19", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 19", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "PAN20", "grupo": "Grupo L", "selecao": "Panamá", "item": "Panamá 20", "tipo": "Seleção", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC9", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC9", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC10", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC10", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC11", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC11", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC12", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC12", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC13", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC13", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC14", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC14", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC15", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC15", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC16", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC16", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC17", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC17", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC18", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC18", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "FWC19", "grupo": "FIFA World Cup History", "selecao": "FIFA World Cup History", "item": "FWC19", "tipo": "História", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC1", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC1", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC2", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC2", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC3", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC3", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC4", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC4", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC5", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC5", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC6", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC6", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC7", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC7", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC8", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC8", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC9", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC9", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC10", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC10", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC11", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC11", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC12", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC12", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC13", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC13", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}, {"codigo": "CC14", "grupo": "Figurinhas da Coca-Cola", "selecao": "Coca-Cola", "item": "CC14", "tipo": "Coca-Cola", "status": "Falta", "repetidas": 0, "obs": ""}];
+    const STORAGE_KEY = "album_copa_2026_progresso_atual";
+    const LEGACY_KEYS = [
+      "album_copa_2026_oficial_mfs_v2_mobile",
+      "album_copa_2026_oficial_mfs_v2",
+      "album_copa_2026_gabarito_v1"
+    ];
+    const DB_NAME = "album_copa_2026_db";
+    const DB_STORE = "progresso";
+    const DB_RECORD = "estado_atual";
+
+    let data = structuredClone(BASE_DATA);
+    let quickView = "";
+    let visibleLimit = 80;
+
+    function markSaveStatus(text) {
+      const el = document.getElementById("savePill");
+      if (el) el.textContent = text;
+    }
+
+    function normalizeData(saved) {
+      if (!Array.isArray(saved)) return null;
+      const map = new Map(saved.map(x => [x.codigo, x]));
+      const merged = BASE_DATA.map(base => {
+        const old = map.get(base.codigo);
+        return old ? { ...base, ...old } : { ...base };
+      });
+      return merged.length === BASE_DATA.length ? merged : null;
+    }
+
+    function loadDataSync() {
+      try {
+        const main = normalizeData(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+        if (main) return main;
+
+        for (const key of LEGACY_KEYS) {
+          const migrated = normalizeData(JSON.parse(localStorage.getItem(key)));
+          if (migrated) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+            return migrated;
+          }
+        }
+      } catch(e) {}
+      return structuredClone(BASE_DATA);
+    }
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        if (!("indexedDB" in window)) return reject(new Error("IndexedDB indisponível"));
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function saveToIndexedDB(payload) {
+      try {
+        const db = await openDB();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(DB_STORE, "readwrite");
+          tx.objectStore(DB_STORE).put(payload, DB_RECORD);
+          tx.oncomplete = resolve;
+          tx.onerror = () => reject(tx.error);
+        });
+        db.close();
+      } catch(e) {}
+    }
+
+    async function loadFromIndexedDB() {
+      try {
+        const db = await openDB();
+        const result = await new Promise((resolve, reject) => {
+          const tx = db.transaction(DB_STORE, "readonly");
+          const request = tx.objectStore(DB_STORE).get(DB_RECORD);
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+        db.close();
+        return normalizeData(result);
+      } catch(e) {
+        return null;
+      }
+    }
+
+    async function hydrateData() {
+      data = loadDataSync();
+      const dbData = await loadFromIndexedDB();
+      if (dbData) data = dbData;
+      saveData();
+      fillFilters();
+      render();
+    }
+
+    function saveData() {
+      try {
+        const payload = JSON.stringify(data);
+        localStorage.setItem(STORAGE_KEY, payload);
+        localStorage.setItem(STORAGE_KEY + "_backup", payload);
+      } catch(e) {}
+      saveToIndexedDB(data);
+      markSaveStatus("Progresso salvo");
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function fillFilters() {
+      const grupoAtual = document.getElementById("filterGrupo").value;
+      const selecaoAtual = document.getElementById("filterSelecao").value;
+
+      const grupos = [...new Set(data.map(x => x.grupo))];
+      const selecoes = [...new Set(data.map(x => x.selecao))];
+
+      document.getElementById("filterGrupo").innerHTML =
+        '<option value="">Todos os grupos</option>' +
+        grupos.map(g => `<option value="${escapeHtml(g)}" ${g === grupoAtual ? "selected" : ""}>${escapeHtml(g)}</option>`).join("");
+
+      document.getElementById("filterSelecao").innerHTML =
+        '<option value="">Todas as seleções</option>' +
+        selecoes.map(s => `<option value="${escapeHtml(s)}" ${s === selecaoAtual ? "selected" : ""}>${escapeHtml(s)}</option>`).join("");
+    }
+
+    function getNumericOrder(code) {
+      if (code === "FWC00") return 0;
+      const fwc = code.match(/^FWC(\d+)$/);
+      if (fwc) return Number(fwc[1]);
+      const cc = code.match(/^CC(\d+)$/);
+      if (cc) return 2000 + Number(cc[1]);
+      const normal = code.match(/^([A-Z]{3})(\d+)$/);
+      if (normal) return 100 + BASE_DATA.findIndex(x => x.codigo === code);
+      return 9999;
+    }
+
+    function filteredRows() {
+      const search = document.getElementById("search").value.toLowerCase().trim();
+      const grupo = document.getElementById("filterGrupo").value;
+      const selecao = document.getElementById("filterSelecao").value;
+      const tipo = document.getElementById("filterTipo").value;
+      const sortBy = document.getElementById("sortBy").value;
+
+      let rows = data.filter(item => {
+        const hay = `${item.codigo} ${item.grupo} ${item.selecao} ${item.item} ${item.tipo} ${item.status} ${item.obs}`.toLowerCase();
+        if (search && !hay.includes(search)) return false;
+        if (grupo && item.grupo !== grupo) return false;
+        if (selecao && item.selecao !== selecao) return false;
+        if (tipo && item.tipo !== tipo) return false;
+        if (quickView === "faltantes" && item.status !== "Falta") return false;
+        if (quickView === "tenho" && item.status !== "Tenho") return false;
+        if (quickView === "repetidas" && Number(item.repetidas) <= 0) return false;
+        return true;
+      });
+
+      rows.sort((a, b) => {
+        if (sortBy === "faltantes") {
+          return (a.status === "Falta" ? 0 : 1) - (b.status === "Falta" ? 0 : 1) || getNumericOrder(a.codigo) - getNumericOrder(b.codigo);
+        }
+        if (sortBy === "repetidas") {
+          return (Number(b.repetidas) || 0) - (Number(a.repetidas) || 0) || getNumericOrder(a.codigo) - getNumericOrder(b.codigo);
+        }
+        if (sortBy === "selecao") {
+          return a.selecao.localeCompare(b.selecao, "pt-BR") || getNumericOrder(a.codigo) - getNumericOrder(b.codigo);
+        }
+        return getNumericOrder(a.codigo) - getNumericOrder(b.codigo);
+      });
+
+      return rows;
+    }
+
+    function render() {
+      const rows = filteredRows();
+      const cards = document.getElementById("cards");
+      const visible = rows.slice(0, visibleLimit);
+
+      cards.innerHTML = visible.map(item => `
+        <article class="sticker-card">
+          <div class="sticker-top">
+            <span class="code">${escapeHtml(item.codigo)}</span>
+            <span class="type">${escapeHtml(item.tipo)}</span>
+          </div>
+
+          <h3>${escapeHtml(item.selecao)}</h3>
+          <p class="meta">${escapeHtml(item.grupo)} • ${escapeHtml(item.item)}</p>
+
+          <div class="card-controls">
+            <div class="status-toggle">
+              <button class="status-btn ${item.status === "Tenho" ? "on-have" : ""}" onclick="setStatus('${item.codigo}', 'Tenho')">Tenho</button>
+              <button class="status-btn ${item.status === "Falta" ? "on-miss" : ""}" onclick="setStatus('${item.codigo}', 'Falta')">Falta</button>
+            </div>
+
+            <div class="rep-control">
+              <button onclick="changeRep('${item.codigo}', -1)">−</button>
+              <span>${Number(item.repetidas) || 0}</span>
+              <button onclick="changeRep('${item.codigo}', 1)">+</button>
+            </div>
+          </div>
+
+          <input class="obs" value="${escapeHtml(item.obs)}" placeholder="Observação" onchange="updateField('${item.codigo}', 'obs', this.value)" />
+        </article>
+      `).join("");
+
+      if (!rows.length) {
+        cards.innerHTML = '<div class="empty">Nenhuma figurinha encontrada. O álbum não fugiu, só o filtro apertou demais.</div>';
+      } else if (rows.length > visibleLimit) {
+        cards.innerHTML += `<button class="btn btn-soft" style="min-height:54px" onclick="loadMore()">Carregar mais ${Math.min(80, rows.length - visibleLimit)} figurinhas</button>`;
+      }
+
+      document.getElementById("countInfo").textContent = `Mostrando ${Math.min(rows.length, visibleLimit)} de ${rows.length}`;
+      updateKPIs();
+    }
+
+    function updateKPIs() {
+      const total = data.length;
+      const tenho = data.filter(x => x.status === "Tenho").length;
+      const faltam = total - tenho;
+      const rep = data.reduce((acc, x) => acc + (Number(x.repetidas) || 0), 0);
+      const pct = total ? Math.round((tenho / total) * 1000) / 10 : 0;
+
+      document.getElementById("kpiTotal").textContent = total;
+      document.getElementById("kpiTenho").textContent = tenho;
+      document.getElementById("kpiFaltam").textContent = faltam;
+      document.getElementById("kpiRep").textContent = rep;
+      document.getElementById("kpiPct").textContent = `${pct}%`;
+      document.getElementById("progress").style.width = `${pct}%`;
+    }
+
+    function setStatus(codigo, status) {
+      const item = data.find(x => x.codigo === codigo);
+      if (!item) return;
+      item.status = status;
+      saveData();
+      render();
+    }
+
+    function changeRep(codigo, delta) {
+      const item = data.find(x => x.codigo === codigo);
+      if (!item) return;
+      item.repetidas = Math.max(0, (Number(item.repetidas) || 0) + delta);
+      if (item.repetidas > 0 && item.status === "Falta") item.status = "Tenho";
+      saveData();
+      render();
+    }
+
+    function updateField(codigo, field, value) {
+      const item = data.find(x => x.codigo === codigo);
+      if (!item) return;
+      item[field] = value;
+      saveData();
+      render();
+    }
+
+    function setQuick(view) {
+      quickView = view;
+      visibleLimit = 80;
+      document.querySelectorAll(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
+      render();
+      document.getElementById("list").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function loadMore() {
+      visibleLimit += 80;
+      render();
+    }
+
+    function markVisibleAsTenho() {
+      const rows = filteredRows();
+      if (!rows.length) return toast("Nenhuma figurinha filtrada.");
+      if (!confirm(`Marcar ${rows.length} figurinhas filtradas como Tenho?`)) return;
+      const codes = new Set(rows.map(x => x.codigo));
+      data = data.map(x => codes.has(x.codigo) ? { ...x, status: "Tenho" } : x);
+      saveData();
+      render();
+      toast("Filtro marcado como Tenho.");
+    }
+
+    function exportCSV() {
+      const headers = ["Codigo", "Grupo", "Selecao_Secao", "Item", "Tipo", "Status", "Repetidas", "Observacao"];
+      const rows = data.map(x => [x.codigo, x.grupo, x.selecao, x.item, x.tipo, x.status, x.repetidas, x.obs]);
+      const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell ?? "").replaceAll('"', '""')}"`).join(";")).join("\n");
+
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "gabarito_mobile_figurinhas_copa_2026.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+      toast("CSV exportado.");
+    }
+
+    function exportBackup() {
+      const payload = {
+        app: "album-copa-2026",
+        version: "mobile-paleta-copa",
+        exportedAt: new Date().toISOString(),
+        data
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "backup_progresso_album_copa_2026.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      toast("Backup do progresso gerado.");
+    }
+
+    function importBackup() {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json,application/json";
+      input.onchange = async () => {
+        const file = input.files[0];
+        if (!file) return;
+        try {
+          const parsed = JSON.parse(await file.text());
+          const restored = normalizeData(parsed.data || parsed);
+          if (!restored) {
+            toast("Backup inválido.");
+            return;
+          }
+          data = restored;
+          saveData();
+          fillFilters();
+          render();
+          toast("Backup restaurado.");
+        } catch(e) {
+          toast("Não consegui ler o backup.");
+        }
+      };
+      input.click();
+    }
+
+    function resetAll() {
+      if (!confirm("Zerar todo o controle salvo neste celular?")) return;
+      data = structuredClone(BASE_DATA);
+      saveData();
+      fillFilters();
+      render();
+      toast("Controle zerado.");
+    }
+
+    function focusSearch() {
+      document.getElementById("filters").scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => document.getElementById("search").focus(), 320);
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => setQuick(btn.dataset.view));
+    });
+
+    ["search", "filterGrupo", "filterSelecao", "filterTipo", "sortBy"].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener("input", () => { visibleLimit = 80; render(); });
+      el.addEventListener("change", () => { visibleLimit = 80; render(); });
+    });
+
+    hydrateData();
+  </script>
+</body>
+</html>
