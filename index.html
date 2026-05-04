@@ -858,7 +858,7 @@
         <div class="cloud-icon">☁</div>
         <div>
           <strong>Sincronização com Google Sheets</strong>
-          <p>Use o Google Sheets como nuvem para alternar entre computador e Android. Configure uma vez com o link do Apps Script.</p>
+          <p>Use o Google Sheets como nuvem para alternar entre computador e Android. Primeiro clique em Enviar nuvem no aparelho que tem o progresso correto.</p>
         </div>
       </div>
 
@@ -1458,7 +1458,7 @@
       }, 1800);
     }
 
-    async function cloudPush(silent = false) {
+    function cloudPush(silent = false) {
       const url = getCloudUrl();
       if (!url) {
         if (!silent) configureCloudUrl();
@@ -1467,18 +1467,44 @@
 
       try {
         updateCloudStatus("Enviando progresso para o Google Sheets...");
-        const form = new FormData();
-        form.append("action", "save");
-        form.append("payload", JSON.stringify(cloudPayload()));
 
-        await fetch(url, {
-          method: "POST",
-          mode: "no-cors",
-          body: form
-        });
+        const iframeName = "cloudSyncFrame";
+        let iframe = document.querySelector(`iframe[name="${iframeName}"]`);
+        if (!iframe) {
+          iframe = document.createElement("iframe");
+          iframe.name = iframeName;
+          iframe.style.display = "none";
+          document.body.appendChild(iframe);
+        }
 
-        updateCloudStatus("Progresso enviado para o Google Sheets.");
-        if (!silent) toast("Progresso enviado para a nuvem.");
+        const oldForm = document.getElementById("cloudSyncForm");
+        if (oldForm) oldForm.remove();
+
+        const form = document.createElement("form");
+        form.id = "cloudSyncForm";
+        form.method = "POST";
+        form.action = url;
+        form.target = iframeName;
+        form.style.display = "none";
+
+        const action = document.createElement("input");
+        action.name = "action";
+        action.value = "save";
+
+        const payload = document.createElement("textarea");
+        payload.name = "payload";
+        payload.value = JSON.stringify(cloudPayload());
+
+        form.appendChild(action);
+        form.appendChild(payload);
+        document.body.appendChild(form);
+
+        form.submit();
+
+        setTimeout(() => {
+          updateCloudStatus("Progresso enviado. Confira a aba estado_atual no Google Sheets.");
+          if (!silent) toast("Progresso enviado para a nuvem.");
+        }, 1200);
       } catch(e) {
         updateCloudStatus("Falha ao enviar para o Google Sheets.");
         if (!silent) toast("Não consegui enviar para a nuvem.");
